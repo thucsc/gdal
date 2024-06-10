@@ -1,0 +1,51 @@
+name: Build GDAL Wheel
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        python-version: [3.12.3]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel setuptools numpy
+
+    - name: Install GDAL build dependencies
+      run: |
+        choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional --quiet --wait"
+        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+
+    - name: Build GDAL wheel
+      run: |
+        git clone https://github.com/OSGeo/gdal.git
+        cd gdal
+        git checkout release/3.9
+        cd gdal/swig/python
+        python setup.py build_ext --include-dirs="C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/ucrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/shared" --library-dirs="C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/um/x64"
+        python setup.py bdist_wheel
+
+    - name: Upload wheel to artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: gdal-wheel
+        path: gdal/swig/python/dist/*.whl
