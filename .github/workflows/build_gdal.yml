@@ -44,6 +44,7 @@ jobs:
     - name: Build GDAL wheel
       run: |
         cd gdal/swig/python
+        ls # 列出目录内容以确认路径正确
         python setup.py build_ext --include-dirs="C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/ucrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/shared" --library-dirs="C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/um/x64"
         python setup.py bdist_wheel
 
