@@ -41,10 +41,11 @@ jobs:
         cd gdal
         git checkout release/3.9
 
-    - name: Generate setup.py using CMake
+    - name: Configure GDAL with CMake
       run: |
-        cd gdal/swig/python
-        cmake .
+        mkdir build
+        cd build
+        cmake ..
 
     - name: Build GDAL wheel
       run: |
